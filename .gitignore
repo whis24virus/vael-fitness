@@ -1,0 +1,29 @@
+# System
+.DS_Store
+
+# Node
+node_modules
+.next
+out
+
+# Rust
+target/
+**/*.rs.bk
+
+# Env
+.env
+.env*.local
+
+# Editor
+.vscode
+.idea
+
+# FastEmbed Cache (Large model files)
+.fastembed_cache/
+
+# SQLx (Keep .sqlx/query-*.json, ignore others)
+.sqlx/*
+!.sqlx/query-*.json
+
+# Design Assets
+stitch-export/
