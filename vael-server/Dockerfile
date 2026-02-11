@@ -1,4 +1,4 @@
-FROM rust:1.80 as builder
+FROM rust:latest as builder
 WORKDIR /app
 COPY . .
 RUN ls -la /app
