@@ -1,6 +1,7 @@
 FROM rust:1.80 as builder
 WORKDIR /app
 COPY . .
+RUN ls -la /app
 # Enable offline mode for SQLx to build without DB connection
 ENV SQLX_OFFLINE=true
 RUN cargo build --release
