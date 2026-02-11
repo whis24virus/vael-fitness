@@ -1,7 +1,7 @@
 "use client";
 
 import { X, Check, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -21,6 +21,15 @@ export default function ActiveWorkoutPage() {
     // Load exercises
     const exercises = useLiveQuery(() => db.exercises.toArray());
     const currentExercise = exercises?.find(e => e.id === exerciseId);
+
+    // Auto-select first exercise if ID 1 isn't found
+    useEffect(() => {
+        if (exercises && exercises.length > 0 && !currentExercise) {
+            if (exercises[0].id) {
+                setExerciseId(exercises[0].id);
+            }
+        }
+    }, [exercises, currentExercise]);
 
     // Load sets for this workout
     const currentSets = useLiveQuery(
@@ -111,10 +120,8 @@ export default function ActiveWorkoutPage() {
         <div className="min-h-screen pb-12 flex flex-col bg-black relative">
             {/* Top Bar */}
             <div className="flex justify-between items-center p-5 pt-8 z-10">
-                <Link href="/train">
-                    <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-white">
-                        <X className="h-6 w-6" />
-                    </Button>
+                <Link href="/train" className={buttonVariants({ variant: "ghost", size: "icon" })}>
+                    <X className="h-6 w-6 text-muted-foreground hover:text-white" />
                 </Link>
                 <div className="flex flex-col items-center">
                     <span className="text-[10px] tracking-widest uppercase text-muted-foreground font-semibold">WORKOUT</span>
@@ -152,6 +159,11 @@ export default function ActiveWorkoutPage() {
 
                 {/* Exercise Info */}
                 <div className="text-center mb-10">
+                    {currentExercise?.image && (
+                        <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-2 border-white/10 shadow-2xl">
+                            <img src={currentExercise.image} alt={currentExercise.name} className="w-full h-full object-cover" />
+                        </div>
+                    )}
                     <h2 className="text-3xl font-bold text-white mb-2">{currentExercise?.name || "Loading..."}</h2>
                     <p className="text-lg text-primary font-medium">Set {(currentSets?.length || 0) + 1}</p>
                 </div>

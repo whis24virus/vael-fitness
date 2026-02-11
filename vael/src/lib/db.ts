@@ -6,6 +6,7 @@ export interface Exercise {
     muscle: string;
     equipment: string;
     category: string;
+    image?: string;
 }
 
 export interface Workout {
@@ -146,21 +147,36 @@ export class VaelDatabase extends Dexie {
             nutrition_logs: '++id, date, name, mealType, calories, protein, carbs, fat'
         });
 
-        // Populate with initial data
-        this.on('populate', () => {
-            this.exercises.bulkAdd([
-                { name: 'Barbell Squat', muscle: 'Legs', equipment: 'Barbell', category: 'Strength' },
-                { name: 'Bench Press', muscle: 'Chest', equipment: 'Barbell', category: 'Strength' },
-                { name: 'Deadlift', muscle: 'Back', equipment: 'Barbell', category: 'Strength' },
-                { name: 'Overhead Press', muscle: 'Shoulders', equipment: 'Barbell', category: 'Strength' },
-                { name: 'Pull Up', muscle: 'Back', equipment: 'Bodyweight', category: 'Strength' },
-                { name: 'Dumbbell Row', muscle: 'Back', equipment: 'Dumbbell', category: 'Strength' },
-                { name: 'Lunges', muscle: 'Legs', equipment: 'Dumbbell', category: 'Strength' },
-                { name: 'Plank', muscle: 'Core', equipment: 'Bodyweight', category: 'Strength' },
-                { name: 'Running', muscle: 'Cardio', equipment: 'None', category: 'Cardio' },
-            ]);
+        this.version(7).stores({
+            exercises: '++id, name, muscle, category, image' // Added image field
         });
+    }
+
+    async checkAndSeed() {
+        try {
+            const count = await this.exercises.count();
+            if (count === 0) {
+                await this.exercises.bulkAdd([
+                    { name: 'Barbell Squat', muscle: 'Legs', equipment: 'Barbell', category: 'Strength', image: 'https://images.unsplash.com/photo-1574680096141-9c3c601394d1?q=80&w=200&auto=format&fit=crop' },
+                    { name: 'Bench Press', muscle: 'Chest', equipment: 'Barbell', category: 'Strength', image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=200&auto=format&fit=crop' },
+                    { name: 'Deadlift', muscle: 'Back', equipment: 'Barbell', category: 'Strength', image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=200&auto=format&fit=crop' },
+                    { name: 'Overhead Press', muscle: 'Shoulders', equipment: 'Barbell', category: 'Strength', image: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=200&auto=format&fit=crop' },
+                    { name: 'Pull Up', muscle: 'Back', equipment: 'Bodyweight', category: 'Strength', image: 'https://images.unsplash.com/photo-1598971639058-211a73287db2?q=80&w=200&auto=format&fit=crop' },
+                    { name: 'Dumbbell Row', muscle: 'Back', equipment: 'Dumbbell', category: 'Strength', image: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=200&auto=format&fit=crop' },
+                    { name: 'Lunges', muscle: 'Legs', equipment: 'Dumbbell', category: 'Strength', image: 'https://images.unsplash.com/photo-1574680178050-55c6a6a96e0a?q=80&w=200&auto=format&fit=crop' },
+                    { name: 'Plank', muscle: 'Core', equipment: 'Bodyweight', category: 'Strength', image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=200&auto=format&fit=crop' },
+                    { name: 'Running', muscle: 'Cardio', equipment: 'None', category: 'Cardio', image: 'https://images.unsplash.com/photo-1502904550040-7534597429ae?q=80&w=200&auto=format&fit=crop' },
+                ]);
+                console.log("Database seeded with initial exercises.");
+            }
+        } catch (err) {
+            console.error("Seeding failed", err);
+        }
     }
 }
 
 export const db = new VaelDatabase();
+// Trigger check on load
+if (typeof window !== 'undefined') {
+    db.open().then(() => db.checkAndSeed());
+}
